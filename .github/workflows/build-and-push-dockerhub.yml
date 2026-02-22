@@ -1,15 +1,15 @@
 name: Build and Push DockerHub
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag to build'
         required: false
         default: 'latest'
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build-and-push-dockerhub:
@@ -48,7 +48,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ DOCKER_USERNAME }}
+          username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push DockerHub image
@@ -57,8 +57,8 @@ jobs:
           context: ./services/comfyui
           push: true
           tags: |
-            ${{ DOCKER_USERNAME }}/comfyui-running-on-gpupods:${{ steps.docker_tag.outputs.tag }}
-            ${{ DOCKER_USERNAME }}/comfyui-running-on-gpupods:latest
+            ${{ vars.DOCKER_USERNAME }}/comfyui-running-on-gpupods:${{ steps.docker_tag.outputs.tag }}
+            ${{ vars.DOCKER_USERNAME }}/comfyui-running-on-gpupods:latest
           build-args: |
             COMFYUI_TAG=${{ steps.comfyui_tag.outputs.comfyui_tag }}
           cache-from: type=gha
