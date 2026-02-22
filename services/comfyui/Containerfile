@@ -1,4 +1,4 @@
-# syntax=container/dockerfile:1
+# syntax=docker/dockerfile:1
 FROM docker.io/ubuntu:24.04
 ENV COMFYUI_DIR=/comfyui
 ENV UV_PYTHON_INSTALL_DIR=/opt/python
