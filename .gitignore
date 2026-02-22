@@ -1,0 +1,10 @@
+/.devcontainer
+
+# VSCode specific
+*.code-workspace
+/.vscode
+
+data/**
+output/**
+
+.env

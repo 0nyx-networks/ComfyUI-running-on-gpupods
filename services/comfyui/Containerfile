@@ -1,0 +1,51 @@
+# syntax=container/dockerfile:1
+FROM docker.io/ubuntu:24.04
+ENV COMFYUI_DIR=/comfyui
+ENV UV_PYTHON_INSTALL_DIR=/opt/python
+ENV UV_LINK_MODE=copy
+ENV VENV_PATH=/opt/python-venv
+ENV WORKSPACE="/workspace"
+ENV PYTHONPATH="${PYTHONPATH}:${PWD}"
+ENV PATH="/root/.local/bin:${VENV_PATH}/bin:${PATH}"
+
+RUN set -eux \
+    && apt-get update \
+    && apt-get full-upgrade -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends curl wget git aria2 ca-certificates parallel vim bash bash-completion libxcb1 libglib2.0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && uv venv -p 3.13 ${VENV_PATH} \
+    && . ${VENV_PATH}/bin/activate
+
+ARG COMFYUI_TAG
+
+RUN set -eux \
+    # ComfyUI をクローン,　依存関係をインストール
+    && git clone https://github.com/comfyanonymous/ComfyUI.git ${COMFYUI_DIR} \
+    && cd ${COMFYUI_DIR} \
+    && if [ -z "${COMFYUI_TAG}" ]; then export COMFYUI_TAG="$(git describe --tags --abbrev=0)"; fi \
+    && git checkout tags/${COMFYUI_TAG} \
+    && uv pip install -r requirements.txt \
+    && uv pip install -r manager_requirements.txt \
+    && rm -rf /root/.cache/uv /root/.cache/pip /tmp/*
+
+WORKDIR ${COMFYUI_DIR}
+
+COPY . /container/
+
+RUN set -eux \
+    && chmod u+x /container/entrypoint.sh \
+    && cp /container/extra_model_paths.yaml ${COMFYUI_DIR} \
+    && rm -rf /root/.cache/uv /root/.cache/pip /tmp/*
+
+# NVIDIAランタイムの設定
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV NVIDIA_DISABLE_REQUIRE=1
+
+ENV CLI_ARGS="--dont-print-server --enable-manager"
+
+ENV NUMBER_OF_GPUS=${NUMBER_OF_GPUS:-1}
+EXPOSE ${LISTEN_PORT:-8188}
+CMD ["bash", "/container/entrypoint.sh"]
