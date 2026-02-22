@@ -55,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./services/comfyui
+          file: ./services/comfyui/Containerfile
           push: true
           tags: |
             ${{ vars.DOCKER_USERNAME }}/comfyui-running-on-gpupods:${{ steps.docker_tag.outputs.tag }}
