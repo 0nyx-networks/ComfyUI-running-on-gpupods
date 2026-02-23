@@ -16,7 +16,8 @@ podman pull docker.io/m10i1986/comfyui-running-on-gpupods:${COMFYUI_TAG:-"latest
 podman container run -d --replace \
   --name comfyui-running-on-gpupods \
   -p 8188:8188 \
-  --volume "$(pwd)/data:/workspace" \
+  --volume "$(pwd)/data:/workspace/data" \
+  --volume "$(pwd)/output:/workspace/output" \
   --device "nvidia.com/gpu=all" \
   --env NUMBER_OF_GPUS=1 \
   docker.io/m10i1986/comfyui-running-on-gpupods:${COMFYUI_TAG:-"latest"}

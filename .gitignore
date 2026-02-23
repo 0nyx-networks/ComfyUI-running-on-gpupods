@@ -5,6 +5,8 @@
 /.vscode
 
 data/**
+!data/.gitkeep
 output/**
+!output/.gitkeep
 
 .env
