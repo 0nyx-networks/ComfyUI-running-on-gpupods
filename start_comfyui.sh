@@ -9,6 +9,9 @@ if [ -f ./env ]; then
   set +a
 fi
 
+# Pull the latest ComfyUI image from DockerHub
+podman pull docker.io/m10i1986/comfyui-running-on-gpupods:${COMFYUI_TAG:-"latest"}
+
 # ComfyUIのコンテナを実行(1GPU想定)
 podman container run -d --replace \
   --name comfyui-running-on-gpupods \
@@ -16,6 +19,6 @@ podman container run -d --replace \
   --volume "$(pwd)/data:/workspace" \
   --device "nvidia.com/gpu=all" \
   --env NUMBER_OF_GPUS=1 \
-  localhost/comfyui-running-on-gpupods:${COMFYUI_TAG:-"latest"}
+  docker.io/m10i1986/comfyui-running-on-gpupods:${COMFYUI_TAG:-"latest"}
 
 podman container logs -f comfyui-running-on-gpupods
