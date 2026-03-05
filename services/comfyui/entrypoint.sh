@@ -31,6 +31,12 @@ source ${VENV_PATH}/bin/activate
 # Upgrade torch to latest stable
 uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
 
+# Install ComfyUI requirements
+pushd ${COMFYUI_DIR}
+uv pip install -r requirements.txt
+uv pip install -r manager_requirements.txt
+popd
+
 # --- 3. Print system info ---
 echo "===== ComfyUI Entrypoint Info ====="
 echo "Workspace: ${WORKSPACE}"
@@ -50,6 +56,8 @@ fi
 
 # ComfyUI の custom_nodes ディレクトリを workspace 内のものに置き換え
 pushd ${COMFYUI_DIR}
+uv pip install -r requirements.txt
+uv pip install -r manager_requirements.txt
 rm -rf custom_nodes 2>&1 >/dev/null
 ln -s ${WORKSPACE}/data/comfyui/custom_nodes .
 popd

@@ -26,8 +26,6 @@ RUN set -eux \
     && cd ${COMFYUI_DIR} \
     && if [ -z "${COMFYUI_TAG}" ]; then export COMFYUI_TAG="$(git describe --tags --abbrev=0)"; fi \
     && git checkout tags/${COMFYUI_TAG} \
-    && uv pip install -r requirements.txt \
-    && uv pip install -r manager_requirements.txt \
     && rm -rf /root/.cache/uv /root/.cache/pip /tmp/*
 
 WORKDIR ${COMFYUI_DIR}
