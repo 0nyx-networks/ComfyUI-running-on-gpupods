@@ -29,7 +29,17 @@ done
 source ${VENV_PATH}/bin/activate
 
 # Upgrade torch to latest stable
-uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
+if [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA13.0" ]; then
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
+elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.8" ]; then
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio
+elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.6" ]; then
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "ROCm7.1" ]; then
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.1
+else
+    echo "Unsupported TORCH_PLATFORM: ${TORCH_PLATFORM}. Skipping torch upgrade."
+fi
 
 # Install ComfyUI requirements
 pushd ${COMFYUI_DIR}
