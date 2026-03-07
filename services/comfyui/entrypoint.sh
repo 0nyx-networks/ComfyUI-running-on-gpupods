@@ -113,6 +113,18 @@ cd pixel-socket-extensions-for-comfyui
 uv pip install -r requirements.txt
 popd
 
+# Comfy NEKONOTE extensions をインストール
+#comfy node install comfy-nekonote-extensions は別でComfyUI-Managerをインストールしないと動作しないため手動でインストール
+pushd "${WORKSPACE}/data/comfyui/custom_nodes"
+if [ ! -d "comfy-nekonote-extensions" ] || [ "${FORCE_UPGRADE_CUSTOM_NODES:-'false'}" = "true" ] ; then
+    echo "Installing/upgrading comfy-nekonote-extensions..."
+    rm -rf comfy-nekonote-extensions >/dev/null 2>&1
+    git clone -b main --depth 1 https://github.com/0nyx-networks/comfy-nekonote-extensions.git
+fi
+cd comfy-nekonote-extensions
+uv pip install -r requirements.txt
+popd
+
 # matrix-nio をインストール(ComfyUI-Manager 用)
 uv pip install matrix-nio
 
