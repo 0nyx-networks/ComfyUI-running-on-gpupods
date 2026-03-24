@@ -192,7 +192,7 @@ if [ -f "${WORKSPACE}/comfyui/startup.sh" ]; then
 fi
 
 # --- 7. Tailscale setup ---
-if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ]; then
+if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ] || [ "${TAILSCALE_HOSTNAME}" == "disabled" ]; then
     echo "TAILSCALE_AUTHKEY or TAILSCALE_HOSTNAME is not set. Skipping Tailscale setup."
 else
     echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
@@ -200,9 +200,7 @@ else
     tailscaled --tun=userspace-networking --state=/tmp/tailscale.state &
 
     # tailscaled ready待ち
-    until tailscale status >/dev/null 2>&1; do
-    sleep 1
-    done
+    tailscale wait
 
     tailscale up \
     --authkey=${TAILSCALE_AUTHKEY} \
