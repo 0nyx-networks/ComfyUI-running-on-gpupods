@@ -216,7 +216,7 @@ else
     LISTEN_ADDRESS="127.0.0.1"
 fi
 
-# --- 6. ComfyUI start ---
+# --- 8. ComfyUI start ---
 pushd ${COMFYUI_DIR}
 echo "***** Starting ${NUMBER_OF_GPUS} ComfyUI processes *****"
 LISTEN_PORT=${LISTEN_PORT:-8188}
