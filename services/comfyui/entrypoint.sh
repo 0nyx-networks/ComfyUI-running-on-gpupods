@@ -197,10 +197,11 @@ if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ]; then
 else
     echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
     # Tailscale を利用する場合は起動
+    tailscaled --state=/tmp/tailscale.state &
+    sleep 5
     tailscale up \
     --hostname=${TAILSCALE_HOSTNAME} \
     --authkey=${TAILSCALE_AUTHKEY}?ephemeral=true \
-    --accept-routes \
     --advertise-tags=tag:comfyui-running-on-gpupods
 
     echo "Tailscale setup completed. Current IPs:"
