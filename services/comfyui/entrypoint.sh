@@ -196,12 +196,10 @@ if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ] || [ "${TAILS
     echo "TAILSCALE_AUTHKEY or TAILSCALE_HOSTNAME is not set. Skipping Tailscale setup."
 else
     echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
-    # Tailscale を利用する場合は起動
-    tailscaled --tun=userspace-networking --state=/tmp/tailscale.state &
-
-    until tailscale status >/dev/null 2>&1; do
-    sleep 1
-    done
+    # Tailscale を利用するため起動
+    tailscaled --tun=userspace-networking --state=/tmp/tailscale.state || exit 1 &
+    #起動完了まで少し待つ
+    sleep 3
 
     tailscale up \
     --authkey=${TAILSCALE_AUTHKEY} \
