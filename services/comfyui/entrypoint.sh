@@ -2,6 +2,12 @@
 
 set -Eeuo pipefail
 
+# 通常のListen Address
+LISTEN_ADDRESS=${LISTEN_ADDRESS:-"0.0.0.0"}
+
+TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-""}
+TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui-gpupods1"}
+
 # --- 1. ディレクトリ作成 ---
 mkdir -p ${WORKSPACE}/data/.cache
 mkdir -p ${WORKSPACE}/data/comfyui/custom_nodes
@@ -185,20 +191,33 @@ if [ -f "${WORKSPACE}/comfyui/startup.sh" ]; then
     popd
 fi
 
-# --- 7. コマンド実行 ---
-pushd ${COMFYUI_DIR}
-if [ ${NUMBER_OF_GPUS:-1} -gt 1 ]; then
-    echo "***** Starting ${NUMBER_OF_GPUS} ComfyUI processes *****"
-    LISTEN_PORT=${LISTEN_PORT:-8188}
-    for ((idx=0; idx<${NUMBER_OF_GPUS}; idx++)); do
-        CURRENT_PORT=$(($LISTEN_PORT + $idx))
-        echo "***** Starting ComfyUI process $(($idx+1))/${NUMBER_OF_GPUS} on port ${CURRENT_PORT} with GPU ${idx} *****"
-        CUDA_VISIBLE_DEVICES=${idx} python3 -u main.py --listen 0.0.0.0 --port ${CURRENT_PORT} ${CLI_ARGS} &
-    done
+# --- 7. Tailscale setup ---
+if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ]; then
+    echo "TAILSCALE_AUTHKEY or TAILSCALE_HOSTNAME is not set. Skipping Tailscale setup."
 else
-    echo "***** Starting ComfyUI processes *****"
-    python3 -u main.py --listen 0.0.0.0 --port 8188 ${CLI_ARGS} &
+    echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
+    # Tailscale を利用する場合は起動
+    tailscale up \
+    --hostname=${TAILSCALE_HOSTNAME} \
+    --authkey=${TAILSCALE_AUTHKEY}?ephemeral=true \
+    --accept-routes \
+    --advertise-tags=tag:comfyui-running-on-gpupods
+
+    echo "Tailscale setup completed. Current IPs:"
+    tailscale ip -4
+
+    LISTEN_ADDRESS="127.0.0.1"
 fi
+
+# --- 6. ComfyUI start ---
+pushd ${COMFYUI_DIR}
+echo "***** Starting ${NUMBER_OF_GPUS} ComfyUI processes *****"
+LISTEN_PORT=${LISTEN_PORT:-8188}
+for ((idx=0; idx<${NUMBER_OF_GPUS}; idx++)); do
+    CURRENT_PORT=$(($LISTEN_PORT + $idx))
+    echo "***** Starting ComfyUI process $(($idx+1))/${NUMBER_OF_GPUS} on port ${CURRENT_PORT} with GPU ${idx} *****"
+    CUDA_VISIBLE_DEVICES=${idx} python3 -u main.py --listen ${LISTEN_ADDRESS} --port ${CURRENT_PORT} ${CLI_ARGS} &
+done
 popd
 
 wait

@@ -11,8 +11,9 @@ ENV PATH="/root/.local/bin:${VENV_PATH}/bin:${PATH}"
 RUN set -eux \
     && apt-get update \
     && apt-get full-upgrade -y --no-install-recommends \
-    && apt-get install -y --no-install-recommends curl wget git aria2 ca-certificates parallel vim bash bash-completion libxcb1 libglib2.0 \
+    && apt-get install -y --no-install-recommends curl wget git aria2 ca-certificates parallel vim bash bash-completion libxcb1 libglib2.0 gnupg iptables \
     && apt-get clean \
+    && curl -fsSL https://tailscale.com/install.sh | sh \
     && rm -rf /var/lib/apt/lists/* \
     && curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv venv -p 3.13 ${VENV_PATH} \
