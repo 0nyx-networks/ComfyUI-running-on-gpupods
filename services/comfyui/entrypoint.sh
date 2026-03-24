@@ -197,13 +197,19 @@ if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ]; then
 else
     echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
     # Tailscale を利用する場合は起動
-    tailscaled --state=/tmp/tailscale.state --tun=userspace-networking &
-    sleep 5
+    tailscaled --tun=userspace-networking --state=/tmp/tailscale.state &
+
+    # tailscaled ready待ち
+    until tailscale status >/dev/null 2>&1; do
+    sleep 1
+    done
+
     tailscale up \
+    --authkey=${TAILSCALE_AUTHKEY} \
     --hostname=${TAILSCALE_HOSTNAME} \
-    --authkey=${TAILSCALE_AUTHKEY}?ephemeral=true \
     --advertise-tags=tag:comfyui-running-on-gpupods \
     --accept-routes \
+    --reset
 
     echo "Tailscale setup completed. Current IPs:"
     tailscale ip -4
