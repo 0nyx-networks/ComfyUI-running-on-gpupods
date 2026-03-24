@@ -199,8 +199,9 @@ else
     # Tailscale を利用する場合は起動
     tailscaled --tun=userspace-networking --state=/tmp/tailscale.state &
 
-    # tailscaled ready待ち
-    tailscale wait
+    until tailscale status >/dev/null 2>&1; do
+    sleep 1
+    done
 
     tailscale up \
     --authkey=${TAILSCALE_AUTHKEY} \
@@ -208,6 +209,8 @@ else
     --advertise-tags=tag:comfyui-running-on-gpupods \
     --accept-routes \
     --reset
+
+    tailscale wait
 
     echo "Tailscale setup completed. Current IPs:"
     tailscale ip -4
