@@ -192,29 +192,26 @@ if [ -f "${WORKSPACE}/comfyui/startup.sh" ]; then
 fi
 
 # --- 7. Tailscale setup ---
-if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ] || [ "${TAILSCALE_HOSTNAME}" == "disabled" ]; then
-    echo "TAILSCALE_AUTHKEY or TAILSCALE_HOSTNAME is not set. Skipping Tailscale setup."
-else
-    echo "TAILSCALE_AUTHKEY and TAILSCALE_HOSTNAME are set. Setting up Tailscale..."
-    # Tailscale を利用するため起動
-    tailscaled --tun=userspace-networking --state=/tmp/tailscale.state || exit 1 &
-    #起動完了まで少し待つ
-    sleep 3
+echo "Setting up Tailscale..."
 
-    tailscale up \
-    --authkey=${TAILSCALE_AUTHKEY} \
-    --hostname=${TAILSCALE_HOSTNAME} \
-    --advertise-tags=tag:comfyui-running-on-gpupods \
-    --accept-routes \
-    --reset
+# 証明書保存用ディレクトリを作成
+mkdir -p /workspace/tailscale-state
 
-    tailscale wait
+# Tailscale を利用するため起動
+tailscaled \
+    --tun=userspace-networking \
+    --statedir=/workspace/tailscale-state &
 
-    echo "Tailscale setup completed. Current IPs:"
-    tailscale ip -4
+tailscale up \
+--authkey=${TAILSCALE_AUTHKEY} \
+--hostname=${TAILSCALE_HOSTNAME} \
+--advertise-tags=tag:comfyui-running-on-gpupods \
+--reset
 
-    LISTEN_ADDRESS="127.0.0.1"
-fi
+tailscale wait
+
+echo "Tailscale setup completed. Current IPs:"
+tailscale ip -4
 
 # --- 8. ComfyUI start ---
 pushd ${COMFYUI_DIR}
@@ -222,11 +219,6 @@ echo "***** Starting ${NUMBER_OF_GPUS} ComfyUI processes *****"
 LISTEN_PORT=${LISTEN_PORT:-8188}
 for ((idx=0; idx<${NUMBER_OF_GPUS}; idx++)); do
     CURRENT_PORT=$(($LISTEN_PORT + $idx))
-
-    # Tailscale を利用する場合は、各プロセスをローカルで待ち受けさせ、Tailscale の serve コマンドで公開する
-    if [ -z "${TAILSCALE_AUTHKEY}" ] || [ -z "${TAILSCALE_HOSTNAME}" ]; then
-        tailscale serve http://${LISTEN_ADDRESS}:${CURRENT_PORT}
-    fi
 
     echo "***** Starting ComfyUI process $(($idx+1))/${NUMBER_OF_GPUS} on port ${CURRENT_PORT} with GPU ${idx} *****"
     CUDA_VISIBLE_DEVICES=${idx} python3 -u main.py --listen ${LISTEN_ADDRESS} --port ${CURRENT_PORT} ${CLI_ARGS} &
