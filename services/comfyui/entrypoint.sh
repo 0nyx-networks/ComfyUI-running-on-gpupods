@@ -6,7 +6,8 @@ set -Eeuo pipefail
 LISTEN_ADDRESS=${LISTEN_ADDRESS:-"0.0.0.0"}
 
 TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-""}
-TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui-gpupods1"}
+TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui-gpupod"}
+TAILSCALE_TAG=${TAILSCALE_TAG:-"cloud-gpu-pods"}
 
 # --- 1. ディレクトリ作成 ---
 mkdir -p ${WORKSPACE}/data/.cache
@@ -205,7 +206,7 @@ tailscaled \
 tailscale up \
 --authkey=${TAILSCALE_AUTHKEY} \
 --hostname=${TAILSCALE_HOSTNAME} \
---advertise-tags=tag:comfyui-running-on-gpupods \
+--advertise-tags=tag:${TAILSCALE_TAG} \
 --reset
 
 tailscale wait
