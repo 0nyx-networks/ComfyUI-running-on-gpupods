@@ -195,26 +195,37 @@ if [ -f "${WORKSPACE}/comfyui/startup.sh" ]; then
 fi
 
 # --- 7. Tailscale setup ---
-echo "Setting up Tailscale..."
+if [ -n "${TAILSCALE_AUTHKEY}" ]; then
+    echo "Setting up Tailscale..."
 
-# 証明書保存用ディレクトリを作成
-mkdir -p /workspace/tailscale-state
+    # 証明書保存用ディレクトリを作成
+    mkdir -p /workspace/tailscale-state
 
-# Tailscale を利用するため起動
-tailscaled \
-    --tun=userspace-networking \
-    --statedir=/workspace/tailscale-state &
+    # Tailscale を利用するため起動
+    tailscaled \
+        --tun=userspace-networking \
+        --statedir=/workspace/tailscale-state &
 
-tailscale up \
---authkey=${TAILSCALE_AUTHKEY} \
---hostname=${TAILSCALE_HOSTNAME} \
---advertise-tags=tag:${TAILSCALE_TAG} \
---reset
+    tailscale up \
+    --authkey=${TAILSCALE_AUTHKEY} \
+    --hostname=${TAILSCALE_HOSTNAME} \
+    --advertise-tags=tag:${TAILSCALE_TAG} \
+    --reset
 
-tailscale wait
+    tailscale wait
 
-echo "Tailscale setup completed. Current IPs:"
-tailscale ip -4
+    echo "Tailscale setup completed. Current IPs:"
+    tailscale ip -4
+
+    # Tailscale が有効な場合、Listen Address を Tailscale IP に限定する
+    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null | head -n1)
+    if [ -n "${TAILSCALE_IP}" ]; then
+        echo "Tailscale is active. Overriding LISTEN_ADDRESS to Tailscale IP: ${TAILSCALE_IP}"
+        LISTEN_ADDRESS="${TAILSCALE_IP}"
+    else
+        echo "Warning: Could not determine Tailscale IP. Keeping LISTEN_ADDRESS=${LISTEN_ADDRESS}"
+    fi
+fi
 
 # --- 8. ComfyUI start ---
 pushd ${COMFYUI_DIR}
