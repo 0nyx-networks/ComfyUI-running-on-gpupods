@@ -217,14 +217,9 @@ if [ -n "${TAILSCALE_AUTHKEY}" ]; then
     echo "Tailscale setup completed. Current IPs:"
     tailscale ip -4
 
-    # Tailscale が有効な場合、Listen Address を Tailscale IP に限定する
-    TAILSCALE_IP=$(tailscale ip -4 2>/dev/null | head -n1)
-    if [ -n "${TAILSCALE_IP}" ]; then
-        echo "Tailscale is active. Overriding LISTEN_ADDRESS to Tailscale IP: ${TAILSCALE_IP}"
-        LISTEN_ADDRESS="${TAILSCALE_IP}"
-    else
-        echo "Warning: Could not determine Tailscale IP. Keeping LISTEN_ADDRESS=${LISTEN_ADDRESS}"
-    fi
+    # userspace-networking モードでは Tailscale IP に直接バインドできないため、
+    # ComfyUI は 127.0.0.1 でListenし、tailscale serve で各ポートを公開する
+    LISTEN_ADDRESS="127.0.0.1"
 fi
 
 # --- 8. ComfyUI start ---
@@ -236,6 +231,12 @@ for ((idx=0; idx<${NUMBER_OF_GPUS}; idx++)); do
 
     echo "***** Starting ComfyUI process $(($idx+1))/${NUMBER_OF_GPUS} on port ${CURRENT_PORT} with GPU ${idx} *****"
     CUDA_VISIBLE_DEVICES=${idx} python3 -u main.py --listen ${LISTEN_ADDRESS} --port ${CURRENT_PORT} ${CLI_ARGS} &
+
+    # Tailscale 使用時は tailscale serve でポートを公開する
+    if [ -n "${TAILSCALE_AUTHKEY}" ]; then
+        tailscale serve --bg --tcp ${CURRENT_PORT} tcp://127.0.0.1:${CURRENT_PORT}
+        echo "Tailscale serve configured for port ${CURRENT_PORT}"
+    fi
 done
 popd
 
