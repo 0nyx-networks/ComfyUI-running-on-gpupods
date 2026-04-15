@@ -39,9 +39,11 @@ source ${VENV_PATH}/bin/activate
 if [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA13.0" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
 elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.8" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.6" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "ROCm7.2" ]; then
+    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2
 elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "ROCm7.1" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.1
 else
