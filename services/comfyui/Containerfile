@@ -13,9 +13,13 @@ RUN set -eux \
     && apt-get full-upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends curl wget git aria2 ca-certificates parallel vim bash bash-completion libxcb1 libglib2.0 gnupg iptables \
     && apt-get clean \
-    && curl -fsSL https://tailscale.com/install.sh | sh \
+    && curl -fsSL https://tailscale.com/install.sh -o /tmp/tailscale-install.sh \
+    && sh /tmp/tailscale-install.sh \
+    && rm -f /tmp/tailscale-install.sh \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && curl -LsSf https://astral.sh/uv/install.sh -o /tmp/uv-install.sh \
+    && sh /tmp/uv-install.sh \
+    && rm -f /tmp/uv-install.sh \
     && uv venv -p 3.13 ${VENV_PATH} \
     && . ${VENV_PATH}/bin/activate
 
