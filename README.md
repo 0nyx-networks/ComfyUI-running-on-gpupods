@@ -60,6 +60,8 @@ cd comfyui-running-on-gpupods
 **環境変数の説明** ([env](env) より):
 
 - `COMFYUI_TAG`: ComfyUIのバージョンタグ（デフォルト: v0.16.0）
+- `TORCH_PLATFORM`: PyTorchのプラットフォーム（デフォルト: CUDA13.0）
+  - サポート値: `CUDA13.0`, `CUDA12.8`, `CUDA12.6`, `ROCm7.2`, `ROCm7.1`
 
 ### 3. コンテナイメージのビルド
 
@@ -149,6 +151,7 @@ podman container run -d --replace \
   --volume "$(pwd)/output:/workspace/output" \
   --device "nvidia.com/gpu=all" \
   --env NUMBER_OF_GPUS=1 \
+  --env TORCH_PLATFORM=CUDA13.0 \
   docker.io/m10i1986/comfyui-running-on-gpupods:latest
 ```
 
@@ -201,6 +204,8 @@ Containerfileは以下の処理を実施します：
 - `NVIDIA_DRIVER_CAPABILITIES=compute,utility`: 計算・ユーティリティ機能を有効化
 - `NUMBER_OF_GPUS`: 使用するGPU数（デフォルト: 1）
 - `CLI_ARGS`: ComfyUI実行オプション（`--dont-print-server --enable-manager`）
+- `TORCH_PLATFORM`: PyTorchをインストールするプラットフォーム（デフォルト: CUDA13.0）
+  - 利用可能な値: `CUDA13.0`, `CUDA12.8`, `CUDA12.6`, `ROCm7.2`, `ROCm7.1`
 
 ## トラブルシューティング
 
