@@ -255,16 +255,6 @@ podman run --rm --device nvidia.com/gpu=all nvidia/cuda:13.0-runtime nvidia-smi
 
 このプロジェクトはMIT Licenseの下で公開されています。詳細は[LICENSE](LICENSE)ファイルを参照してください。
 
-```
-MIT License
-
-Copyright (c) 2025 MINETA "m10i" Hiroki
-```
-
-## 作者
-
-- **MINETA "m10i" Hiroki** - 初期開発・保守
-
 ## 謝辞
 
 このプロジェクトは以下の素晴らしいオープンソースプロジェクトの上に成り立っています：
