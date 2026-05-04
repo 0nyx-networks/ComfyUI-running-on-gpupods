@@ -9,6 +9,8 @@ TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-""}
 TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui-gpupod"}
 TAILSCALE_TAG=${TAILSCALE_TAG:-"cloud-gpu-pods"}
 
+TORCH_PLATFORM=${TORCH_PLATFORM:-"CUDA13.0"}
+
 # --- 1. ディレクトリ作成 ---
 mkdir -p ${WORKSPACE}/data/.cache
 mkdir -p ${WORKSPACE}/data/comfyui/custom_nodes
@@ -36,15 +38,15 @@ done
 source ${VENV_PATH}/bin/activate
 
 # Upgrade torch to latest stable
-if [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA13.0" ]; then
+if [ ${TORCH_PLATFORM} = "CUDA13.0" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
-elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.8" ]; then
+elif [ ${TORCH_PLATFORM} = "CUDA12.8" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
-elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "CUDA12.6" ]; then
+elif [ ${TORCH_PLATFORM} = "CUDA12.6" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
-elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "ROCm7.2" ]; then
+elif [ ${TORCH_PLATFORM} = "ROCm7.2" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2
-elif [ ${TORCH_PLATFORM:-"CUDA13.0"} = "ROCm7.1" ]; then
+elif [ ${TORCH_PLATFORM} = "ROCm7.1" ]; then
     uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.1
 else
     echo "Unsupported TORCH_PLATFORM: ${TORCH_PLATFORM}. Skipping torch upgrade."
