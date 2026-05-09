@@ -6,8 +6,8 @@ set -Eeuo pipefail
 LISTEN_ADDRESS=${LISTEN_ADDRESS:-"0.0.0.0"}
 
 TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-""}
-TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui-gpupod"}
-TAILSCALE_TAG=${TAILSCALE_TAG:-"cloud-gpu-pods"}
+TAILSCALE_HOSTNAME=${TAILSCALE_HOSTNAME:-"comfyui"}
+TAILSCALE_TAG=${TAILSCALE_TAG:-""}
 
 TORCH_PLATFORM=${TORCH_PLATFORM:-"CUDA13.0"}
 
@@ -208,11 +208,15 @@ if [ -n "${TAILSCALE_AUTHKEY}" ]; then
         --tun=userspace-networking \
         --statedir=/workspace/tailscale-state &
 
-    tailscale up \
-    --authkey=${TAILSCALE_AUTHKEY} \
-    --hostname=${TAILSCALE_HOSTNAME} \
-    --advertise-tags=tag:${TAILSCALE_TAG} \
-    --reset
+    TAILSCALE_UP_ARGS=(
+        --authkey="${TAILSCALE_AUTHKEY}"
+        --hostname="${TAILSCALE_HOSTNAME}"
+        --reset
+    )
+    if [ -n "${TAILSCALE_TAG}" ]; then
+        TAILSCALE_UP_ARGS+=(--advertise-tags="tag:${TAILSCALE_TAG}")
+    fi
+    tailscale up "${TAILSCALE_UP_ARGS[@]}"
 
     tailscale wait
 
