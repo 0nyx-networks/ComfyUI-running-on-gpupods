@@ -90,7 +90,7 @@ cat << '_EOL_' > ${COMFYUI_DIR}/user/__manager/config.ini
 [default]
 git_exe =
 use_uv = True
-channel_url = https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main
+channel_url = https://raw.githubusercontent.com/Comfy-Org/ComfyUI-Manager/main
 share_option = all
 bypass_ssl = False
 file_logging = True
