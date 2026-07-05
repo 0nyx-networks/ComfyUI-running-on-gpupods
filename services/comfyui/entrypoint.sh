@@ -38,16 +38,18 @@ done
 source ${VENV_PATH}/bin/activate
 
 # Upgrade torch to latest stable
-if [ ${TORCH_PLATFORM} = "CUDA13.0" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
+if [ ${TORCH_PLATFORM} = "CUDA13.2" ]; then
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/cu132
+elif [ ${TORCH_PLATFORM} = "CUDA13.0" ]; then
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/cu130
 elif [ ${TORCH_PLATFORM} = "CUDA12.8" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 elif [ ${TORCH_PLATFORM} = "CUDA12.6" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
 elif [ ${TORCH_PLATFORM} = "ROCm7.2" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.2
 elif [ ${TORCH_PLATFORM} = "ROCm7.1" ]; then
-    uv pip install --upgrade "torch>=2.10.0" torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.1
+    uv pip install torchvision torchaudio --index-url https://download.pytorch.org/whl/rocm7.1
 else
     echo "Unsupported TORCH_PLATFORM: ${TORCH_PLATFORM}. Skipping torch upgrade."
 fi
