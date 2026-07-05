@@ -27,7 +27,7 @@ ARG COMFYUI_TAG
 
 RUN set -eux \
     # ComfyUI をクローン,　依存関係をインストール
-    && git clone https://github.com/comfyanonymous/ComfyUI.git ${COMFYUI_DIR} \
+    && git clone https://github.com/Comfy-Org/ComfyUI.git ${COMFYUI_DIR} \
     && cd ${COMFYUI_DIR} \
     && if [ -z "${COMFYUI_TAG}" ]; then export COMFYUI_TAG="$(git describe --tags --abbrev=0)"; fi \
     && git checkout tags/${COMFYUI_TAG} \
