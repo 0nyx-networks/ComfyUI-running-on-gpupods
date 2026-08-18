@@ -138,6 +138,17 @@ cd comfy-nekonote-extensions
 uv pip install -r requirements.txt
 popd
 
+# ComfyUI-Model-Manager をインストール
+pushd "${WORKSPACE}/data/comfyui/custom_nodes"
+if [ ! -d "ComfyUI-Model-Manager" ] || [ "${FORCE_UPGRADE_CUSTOM_NODES:-'false'}" = "true" ] ; then
+    echo "Installing/upgrading ComfyUI-Model-Manager..."
+    rm -rf ComfyUI-Model-Manager >/dev/null 2>&1
+    git clone -b main --depth 1 https://github.com/hayden-cn/ComfyUI-Model-Manager.git
+fi
+cd ComfyUI-Model-Manager
+uv pip install -r requirements.txt
+popd
+
 # matrix-nio をインストール(ComfyUI-Manager 用)
 uv pip install matrix-nio
 
